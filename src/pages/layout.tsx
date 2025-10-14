@@ -1,6 +1,6 @@
 import { Outlet } from "react-router";
 
-export default function RootLayout() {
+const layout = () => {
   return (
     <div className="page">
       <div className="container">
@@ -8,4 +8,6 @@ export default function RootLayout() {
       </div>
     </div>
   );
-}
+};
+
+export default layout;
