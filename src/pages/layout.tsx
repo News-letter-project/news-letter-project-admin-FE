@@ -1,12 +1,20 @@
+import Header from "@/components/Header";
+import LeftMenu from "@/components/leftmenu/LeftMenu";
 import { Outlet } from "react-router";
 
 const layout = () => {
   return (
-    <div className="page">
-      <div className="container">
-        <Outlet />
+    <>
+      <div className="bg-gray-100">
+        <div className="flex h-screen">
+          <LeftMenu />
+          <div className="flex-1 flex flex-col">
+            <Header />
+            <Outlet />
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
