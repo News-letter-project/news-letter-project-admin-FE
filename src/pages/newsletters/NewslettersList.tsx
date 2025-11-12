@@ -135,6 +135,8 @@ const NewslettersList = () => {
               key: "manage",
               label: "작업",
               render: (_value, row) => {
+                const isPublished = row.status === "published";
+
                 // 수정 버튼 클릭할 때
                 const handleUpdate = () => {
                   console.log("수정 버튼 클릭할 때 기능 구현 예정");
@@ -150,13 +152,27 @@ const NewslettersList = () => {
                   <div className="flex justify-center gap-2">
                     <button
                       onClick={handleUpdate}
-                      className="px-3 py-1.5 rounded-md text-xs font-medium border border-gray-400 bg-white text-black hover:bg-gray-100 cursor-pointer"
+                      disabled={isPublished}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium border border-gray-400 
+                        ${
+                          !isPublished
+                            ? "bg-white text-black hover:bg-gray-100 cursor-pointer"
+                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        }
+                        `}
                     >
                       <i className="fas fa-pencil"></i>
                     </button>
                     <button
                       onClick={handleDelete}
-                      className="px-3 py-1.5 rounded-md text-xs font-medium border border-gray-400 bg-white text-black hover:bg-gray-100 cursor-pointer"
+                      disabled={isPublished}
+                      className={`px-3 py-1.5 rounded-md text-xs font-medium border border-gray-400
+                        ${
+                          !isPublished
+                            ? "bg-white text-black hover:bg-gray-100 cursor-pointer"
+                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                        }
+                        `}
                     >
                       <i className="fas fa-trash"></i>
                     </button>
