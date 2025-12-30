@@ -184,7 +184,19 @@ const SubscribersList = () => {
         <Table
           columns={[
             { key: "email", label: "이메일 주소" },
-            { key: "created_at", label: "구독일" },
+            { 
+              key: "created_at", 
+              label: "구독일",
+              render: (value: string) => {
+                if (!value) return "-";
+
+                const date = new Date(value);
+
+                return (
+                  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
+                );
+              }
+            },
             {
               key: "statusBcode",
               label: "구독 상태",
