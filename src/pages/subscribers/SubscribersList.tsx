@@ -267,9 +267,13 @@ const SubscribersList = () => {
           setConfirmOpen(false);
         }}
       />
-      <Pagination pagination={paginationInfo} moveToPage={(passedPage) => {
-        setPage(passedPage - 1);
-      }} />
+      {tableData.length === 0 ? (
+       ""
+      ) : (
+        <Pagination pagination={paginationInfo} moveToPage={(passedPage) => {
+          setPage(passedPage - 1);
+        }} />
+      )}
     </div>
   );
 };
