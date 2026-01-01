@@ -122,6 +122,7 @@ const SubscribersList = () => {
       if (res.ok) {
         // 구독 삭제후 데이터 갱신
         setTableData((prevData) => prevData.filter((item) => item.subscriberId !== selectedRow.subscriberId));
+        setSubscribedCount((prevCount) => prevCount - 1);
         fetchData();
         alert("구독자 정보가 완전 삭제되었습니다.");
       } else {
