@@ -68,13 +68,13 @@ const ContentEdit = ({ mode = CODE.MODE_CREATE }: Props) => {
   // common 저장 함수
   const saveContent = async (saveStatus: "DRAFT" | "PUBLISHED") => {
     // 제목 입력 체크
-    if (!contentDetail?.title.trim()) {
+    if (!contentDetail.title.trim()) {
       alert("제목을 입력해주세요.");
       return;
     }
 
     // 내용 입력 체크
-    const plainText = contentDetail?.contentHtml
+    const plainText = contentDetail.contentHtml
       .replace(/<[^>]+>/g, "")
       .replace(/&nbsp;/g, " ")
       .trim();
@@ -83,37 +83,90 @@ const ContentEdit = ({ mode = CODE.MODE_CREATE }: Props) => {
       return;
     }
 
+    if (loading) return;
+
     try {
-      console.log("저장 상태:", saveStatus);
       setLoading(true);
 
       // 등록/수정 API 호출 분기 처리
       const apiRequest = () => {
+        // 수정일 때
         if (modifyMode && contentId) {
-          const url = `/api/contents/${contentId}`;
-          return { url, method: "PUT" };
+          let url = '';
+          // 발행
+          if (saveStatus === "PUBLISHED") {
+            url = '/api/api/v1/admin/post/update/publish';
+          }
+          // 임시저장
+          else if (saveStatus === "DRAFT") {
+            url = '/api/api/v1/admin/post/update/redraft';
+          }
+          type BodyModifyJson = {
+            postId: number;
+            title: string;
+            contentHtml: string;
+            statusBcode: "DRAFT" | "PUBLISHED";
+          };
+
+          const bodyJson: BodyModifyJson = {
+            postId: Number(contentId),
+            title: contentDetail.title,
+            contentHtml: contentDetail.contentHtml,
+            statusBcode: saveStatus,
+          };
+
+          return { url, method: "PATCH", bodyJson };
+        // 등록일 때
         } else {
-          const url = "/api/contents";
-          return { url, method: "POST" };
+          let url = '';
+          // 발행
+          if (saveStatus === "PUBLISHED") {
+            url = '/api/api/v1/admin/post/publish';
+          }
+          // 임시저장
+          else if (saveStatus === "DRAFT") {
+            url = '/api/api/v1/admin/post/draft';
+          }
+
+          type BodySaveJson = {
+            adminId: number;
+            title: string;
+            contentHtml: string;
+            statusBcode: "DRAFT" | "PUBLISHED";
+          };
+
+          const bodyJson: BodySaveJson = {
+            adminId: 1,
+            title: contentDetail.title,
+            contentHtml: contentDetail.contentHtml,
+            statusBcode: saveStatus,
+          };
+
+          return { url, method: "POST", bodyJson };
         }
       };
 
-      const { url, method } = apiRequest();
+      const { url, method, bodyJson } = apiRequest();
 
       const res = await fetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
         },
-        //body: JSON.stringify({ title, content, status: saveStatus }),
+        body: JSON.stringify(bodyJson),
       });
-      const result = await res.json();
-      if (!res.ok) throw new Error(result.message || "저장 실패");
-      console.log("저장 결과:", result);
-      navigate(URL.ADMIN_CONTENTS);
+
+      if (res.ok) {
+        const result = await res.text();
+        alert(result);
+        navigate(URL.ADMIN_CONTENTS);
+      } else {
+        alert("저장에 실패하였습니다.");
+        return false;
+      }
     } catch (err) {
       console.error("저장 실패:", err);
-      alert("저장 중 오류가 발생했습 니다.");
+      alert("저장 중 오류가 발생했습니다.");
     } finally {
       setLoading(false);
     }
@@ -162,7 +215,7 @@ const ContentEdit = ({ mode = CODE.MODE_CREATE }: Props) => {
               <TinyMceEditor content={contentDetail.contentHtml} setContent={html => setContentDetail(prev => ({...prev, contentHtml: html}))} />
             ) : (
               <div className="mt-4 bg-white rounded p-4">
-                <div className="editor-preview max-w-none h-[610px]" dangerouslySetInnerHTML={{ __html: contentDetail.contentHtml }} />
+                <div className="editor-preview max-w-none h-full" dangerouslySetInnerHTML={{ __html: contentDetail.contentHtml }} />
               </div>
             )}
           </div>
